@@ -1,4 +1,4 @@
-/*************************************************************************************************
+  /*************************************************************************************************
   ESP32 Web Server
   Ejemplo de creación de Web server con acceso a SPIFFS
   Basándose en los ejemplos de:
@@ -23,21 +23,47 @@ IPAddress local_ip(192,168,1,75);
 IPAddress gateway(192,168,1,75);
 IPAddress subnet(255,255,255,0);
 char com;
+String parqueo1;
+String parqueo2;
+String parqueo3;
+String parqueo4;
+String parqueo5;
+String parqueo6;
+String parqueo7;
+String parqueo8;
+String totalpark;
+String datos = "";
+String getValue(String data, char separator, int index);
 
+String estadopark1;
+String estadopark2;
+String estadopark3;
+String estadopark4;
+String estadopark5;
+String estadopark6;
+String estadopark7;
+String estadopark8;
+uint8_t total;
 
 WebServer server(80);  // Object of WebServer(HTTP port, 80 is defult)
 
 uint8_t LED1pin = 2;
 bool LED1status = LOW;
+int status1, status2, status3;
+int go; 
 
 //************************************************************************************************
 // Configuración
 //************************************************************************************************
 void setup() {
   pinMode(32, OUTPUT);                        // Pin para el led
-  pinMode(32, OUTPUT);                        // Pin para el led
+  pinMode(33, OUTPUT);                        // Pin para el led
   pinMode(25,OUTPUT);                        // Pin para el led
   pinMode(26, OUTPUT);                        // Pin para el led
+  pinMode(27, OUTPUT);
+  pinMode(14, OUTPUT);
+  pinMode(12,OUTPUT);
+  
   #define RXD2 16 
   #define TXD2 17
   Serial.begin(115200);
@@ -56,8 +82,14 @@ void setup() {
   Serial.println(password);
 
   server.on("/", handle_OnConnect); // página de inicio
-  server.on("/led1on", handle_led1on); // handler al activar led
-  server.on("/led1off", handle_led1off); // handler al desactivar led
+  server.on("/s1", handle_s1); // handler al haber uno ocupado
+  server.on("/s2", handle_s2); //
+  server.on("/s3", handle_s3); //
+  server.on("/s4", handle_s4); //
+  server.on("/s5", handle_s5); //
+  server.on("/s6", handle_s6); //
+  server.on("/s7", handle_s7); //
+  server.on("/s8", handle_s8); //
   server.onNotFound([]() {                  // si el cliente solicita una uri desconocida
     //if (!HandleFileRead(server.uri()))      // enviar archivo desde SPIFF, si existe
       //handleNotFound();             // sino responder con un error 404 (no existe)
@@ -71,77 +103,450 @@ void setup() {
 //************************************************************************************************
 // loop principal
 //************************************************************************************************
+//void loop() {
+//  server.handleClient(); // escuchar solicitudes de clientes
+//  if (LED1status)
+//  {
+//    digitalWrite(LED1pin, HIGH);
+//  }
+//  else
+//  {
+//    digitalWrite(LED1pin, LOW);
+//  }
+//  Serial.println("Message Received: ");
+//  Serial.println(Serial2.readString()); 
+////if (Serial2.available()){                      
+////    com = Serial2.read();                   // Guardar lo leído en Message
+////    Serial.write(com);                     // Escribir lo que se recibe
+//// 
+////  delay(4);
+////  if(com == 48){                          // Recibe un 1
+////    digitalWrite(32,HIGH);
+////    digitalWrite(33,LOW);
+////    digitalWrite(25,LOW);
+////    digitalWrite(26,LOW);
+////      
+////  }
+////    if(com == 49){                          // Recibe un 1
+////    digitalWrite(32,LOW);
+////    digitalWrite(33,HIGH);
+////    digitalWrite(25,LOW);
+////    digitalWrite(26,LOW);
+////  
+////  }
+////
+////    if(com == 50){                          // Recibe 0
+////    digitalWrite(32,LOW);
+////    digitalWrite(33,LOW);
+////    digitalWrite(25,HIGH);
+////    digitalWrite(26,LOW);
+////     
+////  }
+////
+////   if(com == 51){                          // Recibe 0
+////    digitalWrite(32,LOW);
+////    digitalWrite(33,LOW);
+////    digitalWrite(25,LOW);
+////    digitalWrite(26,HIGH);
+////   
+////      
+////  }
+////   }
+//  
+//}
 void loop() {
-  server.handleClient(); // escuchar solicitudes de clientes
-  if (LED1status)
-  {
-    digitalWrite(LED1pin, HIGH);
-  }
-  else
-  {
-    digitalWrite(LED1pin, LOW);
-  }
+//  server.handleClient();
+//  while (Serial2.available()) {
+//    char inByte = Serial2.read();
+//    if (inByte != '\n') {
+//      //convierto todo a datos
+//      // los datos enviados de la TivaC separados por comas
+//      datos.concat(inByte);
+//    } else {
+//      //Se utiliza la función getValue para separarlos según las comas, debido a que los datos no tienen la misma longitud siempre
+//      parqueo1 = getValue(datos, ',', 0);
+//      parqueo2 = getValue(datos, ',', 1);
+//      parqueo3 = getValue(datos, ',', 2);
+//      parqueo4 = getValue(datos, ',', 3);
+//      totalpark = getValue(datos, ',', 4);
+//      //se limpia la cadena para la proxima lectura
+//      datos = "";
+//    }
+//    //Rutinas con las cuales se define si la TivaC envia si el parqueo esta o no ocupado
+//    if (parqueo1 == "1")estadopark1 = "Disponible"; //Si es uno el parqueo esta disponible 
+//    else estadopark1 = "Ocupado";//Sera 0 si el parque esta ocupado
+//    if (parqueo2 == "1")estadopark2 = "Disponible";
+//    else estadopark2 = "Ocupado";
+//    if (parqueo3 == "1")estadopark3 = "Disponible";
+//    else estadopark3 = "Ocupado";
+//    if (parqueo4 == "1")estadopark4 = "Disponible";
+//    else estadopark4 = "Ocupado";
+//  }
+//}
+ server.handleClient(); // escuchar solicitudes de clientes
+  if (Serial2.available()) {
+    char inByte = Serial2.read();
+    if (inByte != '\n') {
+      //convierto todo a datos
+      // los datos enviados de la TivaC separados por comas
+      datos.concat(inByte);
+    } else {
+      //Se utiliza la función getValue para separarlos según las comas, debido a que los datos no tienen la misma longitud siempre
+      parqueo1 = getValue(datos, ',', 0);
+      parqueo2 = getValue(datos, ',', 1);
+      parqueo3 = getValue(datos, ',', 2);
+      parqueo4 = getValue(datos, ',', 3);
+      parqueo1 = getValue(datos, ',', 4);
+      parqueo2 = getValue(datos, ',', 5);
+      parqueo3 = getValue(datos, ',', 6);
+      parqueo4 = getValue(datos, ',', 7);
+      totalpark = getValue(datos, ',', 8);
+      //se limpia la cadena para la proxima lectura
+      datos = "";
+    }
+    //Rutinas con las cuales se define si la TivaC envia si el parqueo esta o no ocupado
+    if (parqueo1 == "1")estadopark1 = "Disponible"; //Si es uno el parqueo esta disponible 
+    else estadopark1 = "Ocupado";//Sera 0 si el parque esta ocupado
+    if (parqueo2 == "1")estadopark2 = "Disponible";
+    else estadopark2 = "Ocupado";
+    if (parqueo3 == "1")estadopark3 = "Disponible";
+    else estadopark3 = "Ocupado";
+    if (parqueo4 == "1")estadopark4 = "Disponible";
+    else estadopark4 = "Ocupado";
+    if (parqueo5 == "1")estadopark5 = "Disponible"; //Si es uno el parqueo esta disponible 
+    else estadopark5 = "Ocupado";//Sera 0 si el parque esta ocupado
+    if (parqueo6 == "1")estadopark6 = "Disponible";
+    else estadopark6 = "Ocupado";
+    if (parqueo7 == "1")estadopark7 = "Disponible";
+    else estadopark7 = "Ocupado";
+    if (parqueo8 == "1")estadopark8 = "Disponible";
+    else estadopark8 = "Ocupado";
+    
   
-if (Serial2.available()){                      
-    com = Serial2.read();                   // Guardar lo leído en Message
-    Serial.write(com);                     // Escribir lo que se recibe
- 
-  delay(4);
-  if(com == 48){                          // Recibe un 1
-    digitalWrite(32,HIGH);
-    digitalWrite(33,LOW);
-    digitalWrite(25,LOW);
-    digitalWrite(26,LOW);
-      
-  }
-    if(com == 49){                          // Recibe un 1
-    digitalWrite(32,LOW);
-    digitalWrite(33,HIGH);
-    digitalWrite(25,LOW);
-    digitalWrite(26,LOW);
-  
-  }
+    status2 = Serial2.read();
+    //status3 = 0;
+    if(status2 == '0'){
+      Serial.print("0");
+      go = 0;
+      server.send(200, "text/html", SendHTML(go));
+    }
+    if(status2 == '1'){
+      Serial.print("1");
+      go = 1;
+      server.send(200, "text/html", SendHTML(go));
+    }
+    if(status2 == '2'){
+      Serial.print("2");
+      go = 2;
+      server.send(200, "text/html", SendHTML(go));
+    }
+    if(status2 == '3'){
+      Serial.print("3");
+      go = 3;
+      server.send(200, "text/html", SendHTML(go));
+    }
+    if(status2 == '4'){
+      Serial.print("4");
+      go = 4;
+      server.send(200, "text/html", SendHTML(go));
+    }
 
-    if(com == 50){                          // Recibe 0
-    digitalWrite(32,LOW);
-    digitalWrite(33,LOW);
-    digitalWrite(25,HIGH);
-    digitalWrite(26,LOW);
-     
-  }
 
-   if(com == 51){                          // Recibe 0
-    digitalWrite(32,LOW);
-    digitalWrite(33,LOW);
-    digitalWrite(25,LOW);
-    digitalWrite(26,HIGH);
-   
-      
+//    //status2 es tiva1 y status3 es tiva2
+//    if (status2 == '0' and status3 == '0') {
+//      Serial.print("0");
+//      go = 0;
+//      server.send(200, "text/html", SendHTML(go));
+//      //ptr += "<a class=\"button button-off\" href=\"/s8\">Update</a>\n";
+//
+//    }
+//    if (status2 == '0' and status3 == '1') {
+//      Serial.print("1");
+//      go = 1;
+//      server.send(200, "text/html", SendHTML(go));
+//      //ptr += "<a class=\"button button-off\" href=\"/s7\">Update</a>\n";
+//    }
+//    if (status2 == '0' and status3 == '2') {
+//      Serial.print("2");
+//      go = 2;
+//      server.send(200, "text/html", SendHTML(go));
+//      //ptr += "<a class=\"button button-off\" href=\"/s7\">Update</a>\n";
+//    }
+//    if (status2 == '0' and status3 == '3') {
+//      Serial.print("3");
+//      go = 3;
+//      server.send(200, "text/html", SendHTML(go));
+//      //ptr += "<a class=\"button button-off\" href=\"/s7\">Update</a>\n";
+//    }
+//    if (status2 == '0' and status3 == '4') {
+//      Serial.print("4");
+//      go = 4;
+//      server.send(200, "text/html", SendHTML(go));
+//      //ptr += "<a class=\"button button-off\" href=\"/s7\">Update</a>\n";
+//    }
+//    if (status2 == '1' and status3 == '0') {
+//      Serial.print("1");
+//      go = 1;
+//      server.send(200, "text/html", SendHTML(go));
+//      //ptr += "<a class=\"button button-off\" href=\"/s7\">Update</a>\n";
+//    }
+//    if (status2 == '1' and status3 == '1') {
+//      Serial.print("2");
+//      go = 2;
+//      server.send(200, "text/html", SendHTML(go));
+//      //ptr += "<a class=\"button button-off\" href=\"/s7\">Update</a>\n";
+//    }
+//    if (status2 == '1' and status3 == '2') {
+//      Serial.print("3");
+//      go = 3;
+//      server.send(200, "text/html", SendHTML(go));
+//      //ptr += "<a class=\"button button-off\" href=\"/s7\">Update</a>\n";
+//    }
+//    if (status2 == '1' and status3 == '3') {
+//      Serial.print("4");
+//      go = 4;
+//      server.send(200, "text/html", SendHTML(go));
+//      //ptr += "<a class=\"button button-off\" href=\"/s7\">Update</a>\n";
+//    }
+//    if (status2 == '1' and status3 == '4') {
+//      Serial.print("5");
+//      go = 5;
+//      server.send(200, "text/html", SendHTML(go));
+//      //ptr += "<a class=\"button button-off\" href=\"/s7\">Update</a>\n";
+//    }
+//    if (status2 == '2' and status3 == '0') {
+//      Serial.print("2");
+//      go = 2;
+//      server.send(200, "text/html", SendHTML(go));
+//      //ptr += "<a class=\"button button-off\" href=\"/s7\">Update</a>\n";
+//    }
+//    if (status2 == '2' and status3 == '1') {
+//      Serial.print("3");
+//      go = 3;
+//      server.send(200, "text/html", SendHTML(go));
+//      //ptr += "<a class=\"button button-off\" href=\"/s7\">Update</a>\n";
+//    }
+//    if (status2 == '2' and status3 == '2') {
+//      Serial.print("4");
+//      go = 4;
+//      server.send(200, "text/html", SendHTML(go));
+//      //ptr += "<a class=\"button button-off\" href=\"/s7\">Update</a>\n";
+//    }
+//    if (status2 == '2' and status3 == '3') {
+//      Serial.print("5");
+//      go = 5;
+//      server.send(200, "text/html", SendHTML(go));
+//      //ptr += "<a class=\"button button-off\" href=\"/s7\">Update</a>\n";
+//    }
+//    if (status2 == '2' and status3 == '4') {
+//      Serial.print("6");
+//      go = 6;
+//      server.send(200, "text/html", SendHTML(go));
+//      //ptr += "<a class=\"button button-off\" href=\"/s7\">Update</a>\n";
+//    }
+//    if (status2 == '3' and status3 == '0') {
+//      Serial.print("3");
+//      go = 3;
+//      server.send(200, "text/html", SendHTML(go));
+//      //ptr += "<a class=\"button button-off\" href=\"/s7\">Update</a>\n";
+//    }
+//    if (status2 == '3' and status3 == '1') {
+//      Serial.print("4");
+//      go = 4;
+//      server.send(200, "text/html", SendHTML(go));
+//      //ptr += "<a class=\"button button-off\" href=\"/s7\">Update</a>\n";
+//    }
+//    if (status2 == '3' and status3 == '2') {
+//      Serial.print("5");
+//      go = 5;
+//      server.send(200, "text/html", SendHTML(go));
+//      //ptr += "<a class=\"button button-off\" href=\"/s7\">Update</a>\n";
+//    }
+//    if (status2 == '3' and status3 == '3') {
+//      Serial.print("6");
+//      go = 6;
+//      server.send(200, "text/html", SendHTML(go));
+//      //ptr += "<a class=\"button button-off\" href=\"/s7\">Update</a>\n";
+//    }
+//    if (status2 == '3' and status3 == '4') {
+//      Serial.print("7");
+//      go = 7;
+//      server.send(200, "text/html", SendHTML(go));
+//      //ptr += "<a class=\"button button-off\" href=\"/s7\">Update</a>\n";
+//    }
+//    if (status2 == '4' and status3 == '0') {
+//      Serial.print("4");
+//      go = 4;
+//      server.send(200, "text/html", SendHTML(go));
+//      //ptr += "<a class=\"button button-off\" href=\"/s7\">Update</a>\n";
+//    }
+//    if (status2 == '4' and status3 == '1') {
+//      Serial.print("5");
+//      go = 5;
+//      server.send(200, "text/html", SendHTML(go));
+//      //ptr += "<a class=\"button button-off\" href=\"/s7\">Update</a>\n";
+//    }
+//    if (status2 == '4' and status3 == '2') {
+//      Serial.print("6");
+//      go = 6;
+//      server.send(200, "text/html", SendHTML(go));
+//      //ptr += "<a class=\"button button-off\" href=\"/s7\">Update</a>\n";
+//    }
+//    if (status2 == '4' and status3 == '3') {
+//      Serial.print("7");
+//      go = 7;
+//      server.send(200, "text/html", SendHTML(go));
+//      //ptr += "<a class=\"button button-off\" href=\"/s7\">Update</a>\n";
+//    }
+//    if (status2 == '4' and status3 == '4') {
+//      Serial.print("8");
+//      go = 8;
+//      server.send(200, "text/html", SendHTML(go));
+//      //ptr += "<a class=\"button button-off\" href=\"/s7\">Update</a>\n";
+//    }
   }
-   }
-  
 }
+
+//************************************************************************************************
+// Handler de página de inicio
 //************************************************************************************************
 // Handler de página de inicio
 //************************************************************************************************
 void handle_OnConnect() {
-  handle_led1off(); // inicia LED apagado, por defecto
+  //8
+  digitalWrite(32, HIGH); //
+  digitalWrite(33, HIGH); //
+  digitalWrite(25, HIGH); //
+  digitalWrite(26, HIGH); //
+  digitalWrite(27, HIGH); //
+  digitalWrite(14, HIGH); //
+  digitalWrite(12, HIGH); //
+  status1 = 0; // inicia todo libre, por defecto
+  server.send(200, "text/html", SendHTML(status1)); //responde con un OK (200) y envía HTML
 }
 //************************************************************************************************
-// Handler de led1on
+// Handler de 1 ocupado
 //************************************************************************************************
-void handle_led1on() {
-  LED1status = HIGH;
-  Serial.println("GPIO2 Status: ON");
-  server.send(200, "text/html", SendHTML(LED1status)); //responde con un OK (200) y envía HTML
+void handle_s1() {
+  //7
+  digitalWrite(32, HIGH); //
+  digitalWrite(33, HIGH); //
+  digitalWrite(25, HIGH); //
+  digitalWrite(26, LOW); //
+  digitalWrite(27, LOW); //
+  digitalWrite(14, LOW); //
+  digitalWrite(12, LOW); //
+  status1 = 1;
+  server.send(200, "text/html", SendHTML(status1)); //responde con un OK (200) y envía HTML
+
 }
 //************************************************************************************************
-// Handler de led1off
+// Handler de 2 ocupados
 //************************************************************************************************
-void handle_led1off() {
-  LED1status = LOW;
-  Serial.println("GPIO2 Status: OFF");
-  server.send(200, "text/html", SendHTML(LED1status)); //responde con un OK (200) y envía HTML
+void handle_s2() {
+  //6
+  digitalWrite(32, HIGH); //
+  digitalWrite(33, LOW); //
+  digitalWrite(25, HIGH); //
+  digitalWrite(26, HIGH); //
+  digitalWrite(27, HIGH); //
+  digitalWrite(14, HIGH); //
+  digitalWrite(12, HIGH); //
+  status1 = 2;
+  server.send(200, "text/html", SendHTML(status1)); //responde con un OK (200) y envía HTML
+}
+
+//************************************************************************************************
+// Handler de 3 ocupado
+//************************************************************************************************
+void handle_s3() {
+  //5
+  digitalWrite(32, HIGH); //
+  digitalWrite(33, LOW); //
+  digitalWrite(25, HIGH); //
+  digitalWrite(26, HIGH); //
+  digitalWrite(27, LOW); //
+  digitalWrite(14, HIGH); //
+  digitalWrite(12, HIGH); //
+  status1 = 3;
+  server.send(200, "text/html", SendHTML(status1)); //responde con un OK (200) y envía HTML
+}
+//************************************************************************************************
+// Handler de 4 ocupados
+//************************************************************************************************
+void handle_s4() {
+  //4
+  digitalWrite(32, LOW); //
+  digitalWrite(33, HIGH); //
+  digitalWrite(25, HIGH); //
+  digitalWrite(26, LOW); //
+  digitalWrite(27, LOW); //
+  digitalWrite(14, HIGH); //
+  digitalWrite(12, HIGH); //
+  status1 = 4;
+  server.send(200, "text/html", SendHTML(status1)); //responde con un OK (200) y envía HTML
+}
+
+//************************************************************************************************
+// Handler de 5 ocupado
+//************************************************************************************************
+void handle_s5() {
+  //3
+  digitalWrite(32, HIGH); //
+  digitalWrite(33, HIGH); //
+  digitalWrite(25, HIGH); //
+  digitalWrite(26, HIGH); //
+  digitalWrite(27, LOW); //
+  digitalWrite(14, LOW); //
+  digitalWrite(12, HIGH); //
+  status1 = 5;
+  server.send(200, "text/html", SendHTML(status1)); //responde con un OK (200) y envía HTML
+}
+//************************************************************************************************
+// Handler de 6 ocupados
+//************************************************************************************************
+void handle_s6() {
+  //2
+  digitalWrite(32, HIGH); //
+  digitalWrite(33, HIGH); //
+  digitalWrite(25, LOW); //
+  digitalWrite(26, HIGH); //
+  digitalWrite(27, HIGH); //
+  digitalWrite(14, LOW); //
+  digitalWrite(12, HIGH); //
+  status1 = 6;
+  server.send(200, "text/html", SendHTML(status1)); //responde con un OK (200) y envía HTML
+}
+
+//************************************************************************************************
+// Handler de 7 ocupado
+//************************************************************************************************
+void handle_s7() {
+  //1
+  digitalWrite(32, LOW); //
+  digitalWrite(33, HIGH); //
+  digitalWrite(25, HIGH); //
+  digitalWrite(26, LOW); //
+  digitalWrite(27, LOW); //
+  digitalWrite(14, LOW); //
+  digitalWrite(12, LOW); //
+  status1 = 7;
+  server.send(200, "text/html", SendHTML(status1)); //responde con un OK (200) y envía HTML
+}
+//************************************************************************************************
+// Handler de 8 ocupados
+//************************************************************************************************
+void handle_s8() {
+  //0
+  digitalWrite(32, HIGH); //
+  digitalWrite(33, HIGH); //
+  digitalWrite(25, HIGH); //
+  digitalWrite(26, HIGH); //
+  digitalWrite(27, HIGH); //
+  digitalWrite(14, HIGH); //
+  digitalWrite(12, LOW); //
+  status1 = 8;
+  server.send(200, "text/html", SendHTML(status1)); //responde con un OK (200) y envía HTML
 }
 //************************************************************************************************
 // Procesador de HTML
@@ -220,10 +625,10 @@ String SendHTML(uint8_t led1stat) {
                "</tfoot>\n"
                "<tbody>\n"
                "<tr>\n"
-//               "<td>" + p1disp + "</td>\n"
-//               "<td>" + p2disp + "</td>\n"
-//               "<td>" + p3disp + "</td>\n"
-//               "<td>" + p4disp + "</td>\n"
+               "<td>" + estadopark1 + "</td>\n"
+               "<td>" + estadopark2 + "</td>\n"
+               "<td>" + estadopark3 + "</td>\n"
+               "<td>" + estadopark4 + "</td>\n"
                "</tr>\n"
                "</tbody>\n"
                "</table>\n"
@@ -247,10 +652,10 @@ String SendHTML(uint8_t led1stat) {
                "</tfoot>\n"
                "<tbody>\n"
                "<tr>\n"
-//               "<td>" + p5disp + "</td>\n"
-//               "<td>" + p6disp + "</td>\n"
-//               "<td>" + p7disp + "</td>\n"
-//               "<td>" + p8disp + "</td>\n"
+               "<td>" + estadopark5 + "</td>\n"
+               "<td>" + estadopark6 + "</td>\n"
+               "<td>" + estadopark7 + "</td>\n"
+               "<td>" + estadopark8 + "</td>\n"
                "</tr>\n"
                "</tbody>\n"
                "</table>\n"
@@ -321,4 +726,19 @@ bool HandleFileRead(String path)
   }
   Serial.println("\tFile Not Found");
   return false;
+}
+String getValue(String data, char separator, int index) {
+  int found = 0;
+  int strIndex[] = {0, -1};
+  int maxIndex = data.length() - 1;
+
+  for (int i = 0; i <= maxIndex && found <= index; i++) {
+    if (data.charAt(i) == separator || i == maxIndex) {
+      found++;
+      strIndex[0] = strIndex[1] + 1;
+      strIndex[1] = (i == maxIndex) ? i + 1 : i;
+    }
+  }
+
+  return found > index ? data.substring(strIndex[0], strIndex[1]) : "";
 }
