@@ -15,13 +15,16 @@ int P1_R = PE_0; //Leds indicadores
 int P1_G = PB_3;
 
 int P2_R = PF_0;
-int P2_G = PC_4;
+int P2_G = PF_3;
 
 int P3_R = PB_7;
 int P3_G = PC_6;
 
 int P4_R = PB_6;
 int P4_G = PC_7;
+
+uint8_t DP [] = { 0, 1, 1, 1, 1, 1, 1, 1 };// Variable para la comunicación serial
+char ds[] = { DP[0], DP[1], DP[2], DP[3], DP[4], DP[5], DP[6], DP[7] };
 
 void setup() {
   // put your setup code here, to run once:
@@ -43,11 +46,20 @@ void setup() {
   pinMode(P4_R, OUTPUT);   
   pinMode(P4_G, OUTPUT);
 
-
+  Serial2.begin(9600);                 // Inicializar C. serial a 9600 bits per second
+  delay(100);
 }
 
 void loop() {
   // put your main code here, to run repeatedly: 
+
+  Serial2.write(ds);
+  delay(10);
+
+  DP[0] = P1;
+  DP[1] = P2;
+  DP[2] = P3;
+  DP[3] = P4;
 //----------------------------------------------------------------------------------
 //Sensor 1
 //----------------------------------------------------------------------------------
