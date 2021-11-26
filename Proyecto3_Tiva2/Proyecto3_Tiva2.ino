@@ -17,11 +17,11 @@ int P1_G = PB_3;
 int P2_R = PF_0;
 int P2_G = PC_4;
 
-int P3_R = PB_7;
-int P3_G = PC_6;
+int P3_R = PB_6;
+int P3_G = PC_7;
 
-int P4_R = PB_6;
-int P4_G = PC_7;
+int P4_R = PA_4;
+int P4_G = PD_6;
 
 void setup() {
   // put your setup code here, to run once:
